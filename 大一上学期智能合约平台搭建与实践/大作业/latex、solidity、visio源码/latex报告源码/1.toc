@@ -1,0 +1,32 @@
+\babel@toc {english}{}\relax 
+\contentsline {section}{概述}{3}{section*.1}%
+\contentsline {section}{\numberline {1}规则设计}{4}{section.1}%
+\contentsline {section}{\numberline {2}代码设计}{5}{section.2}%
+\contentsline {subsection}{\numberline {2.1}生成棋盘}{6}{subsection.2.1}%
+\contentsline {subsection}{\numberline {2.2}玩家加入}{7}{subsection.2.2}%
+\contentsline {subsection}{\numberline {2.3}游戏操作}{7}{subsection.2.3}%
+\contentsline {subsection}{\numberline {2.4}游戏结束}{8}{subsection.2.4}%
+\contentsline {section}{\numberline {3}安全性分析}{9}{section.3}%
+\contentsline {subsection}{\numberline {3.1}随机数产生安全性}{9}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2}非正常输入场景}{9}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}转账}{9}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}算术精度问题}{9}{subsection.3.4}%
+\contentsline {subsection}{\numberline {3.5}避免合约吞钱 \footnote [2]{添加于2021.12.7} }{9}{subsection.3.5}%
+\contentsline {section}{\numberline {4}部署过程}{10}{section.4}%
+\contentsline {section}{\numberline {5}测试与分析}{11}{section.5}%
+\contentsline {subsection}{\numberline {5.1}赢得游戏案例展示}{11}{subsection.5.1}%
+\contentsline {subsection}{\numberline {5.2}不合法操作案例展示}{13}{subsection.5.2}%
+\contentsline {subsubsection}{\numberline {5.2.1}Stake设置过低}{13}{subsubsection.5.2.1}%
+\contentsline {subsubsection}{\numberline {5.2.2}未初始化棋盘}{13}{subsubsection.5.2.2}%
+\contentsline {subsubsection}{\numberline {5.2.3}开幕雷击}{13}{subsubsection.5.2.3}%
+\contentsline {subsubsection}{\numberline {5.2.4}不合法之人加入游戏}{13}{subsubsection.5.2.4}%
+\contentsline {subsubsection}{\numberline {5.2.5}房间已满}{13}{subsubsection.5.2.5}%
+\contentsline {subsubsection}{\numberline {5.2.6}输入范围错误}{14}{subsubsection.5.2.6}%
+\contentsline {subsubsection}{\numberline {5.2.7}重复打开一个格子}{14}{subsubsection.5.2.7}%
+\contentsline {subsubsection}{\numberline {5.2.8}游戏已经结束}{14}{subsubsection.5.2.8}%
+\contentsline {section}{\numberline {6}改进思路展望}{15}{section.6}%
+\contentsline {subsection}{\numberline {6.1}配备前端}{15}{subsection.6.1}%
+\contentsline {subsection}{\numberline {6.2}安全性改进}{15}{subsection.6.2}%
+\contentsline {section}{\numberline {7}源码及注释}{15}{section.7}%
+\contentsline {subsection}{\numberline {7.1}第一个合约——MineSweeper.sol}{15}{subsection.7.1}%
+\contentsline {subsection}{\numberline {7.2}第二个合约——Player.sol}{20}{subsection.7.2}%

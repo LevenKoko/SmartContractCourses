@@ -1,0 +1,562 @@
+\documentclass[UTF8]{ctexart}
+\usepackage[left=2.50cm, right=2.50cm, top=2.50cm, bottom=2.50cm]{geometry} %页边距
+\usepackage{amsmath, amsfonts, amssymb} % 数学公式、符号
+\usepackage[english]{babel}
+\usepackage{graphicx}   % 图片
+\usepackage{url}        % 超链接
+\usepackage{bm}         % 加粗方程字体
+\usepackage{indentfirst} %首行缩进
+\usepackage{multirow}
+\usepackage{booktabs}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{inconsolata}
+\usepackage{color}
+\usepackage{xcolor}
+\definecolor{pblue}{rgb}{0.13,0.13,1}
+\definecolor{pgreen}{rgb}{0,0.5,0}
+\definecolor{pred}{rgb}{0.9,0,0}
+\definecolor{pgrey}{rgb}{0.46,0.45,0.48}
+\definecolor{gray}{rgb}{0.7,0.7,0.7}
+\usepackage{listings}
+\newcommand\picturehere[2][1]{\centerline{\includegraphics[scale = #1]{#2}}}
+% \renewcommand{\algorithmicensure}{ \textbf{Initialize:}}
+% \renewcommand{\algorithmicreturn}{ \textbf{Output:}}
+%算法格式
+\usepackage{fancyhdr} %设置页眉、页脚
+\pagestyle{fancy}
+\chead{}
+\lhead{}
+\rhead{}
+\lfoot{}
+\usepackage[colorlinks=true,linkcolor=black]{hyperref} %bookmarks
+\hypersetup{colorlinks, bookmarks, unicode} %unicode
+\usepackage{multicol}
+\title{\textbf{智能合约Dapp前端操作总结\footnote{正文中以图片为主，文字形式的交易哈希、地址附在文末}}}
+\author{\sffamily 郑力文\footnote{SID:2021080401006；Mail:levenkoko@std.uestc.edu.cn}}
+\date{(Dated: \today)}
+
+
+\lstset{
+	backgroundcolor=\color{gray}, % 选择代码背景，必须加上\ usepackage {color}或\ usepackage {xcolor}.
+	frame=single,
+	rulecolor=\color{red},
+	language=C++,
+	aboveskip=3mm,
+	belowskip=3mm,
+	showspaces=false,
+	showtabs=false,
+	columns=flexible,
+	breaklines=true,
+	tabsize=2,
+	numbers=left,
+	numbersep=-5pt,
+	numberstyle=\tiny\color{red},
+	showstringspaces=false,
+	breakatwhitespace=true,%设置是否当且仅当在空白处自动中断.
+	commentstyle=\color{pgreen},
+	keywordstyle=\color{pblue},
+	stringstyle=\color{pred},
+	basicstyle=\ttfamily,% 设置代码字号.
+	moredelim=[il][\textcolor{pgrey}]{$$},
+	moredelim=[is][\textcolor{pgrey}]{\%\%}{\%\%},
+  escapeinside=``
+}
+
+
+\begin{document}
+		\picturehere[0.08]{uestc.png}
+\begin{center}
+	\quad \\
+	\quad \\
+	\heiti \zihao{1} 智能合约小游戏
+	\vskip 2cm
+	\heiti \zihao{2} 制作与分析
+\end{center}
+\vskip 3.5cm
+
+\begin{center}
+	\songti \fontsize{15}{15}
+	% \doublespacing
+	% \par\setlength\parindent{12em}
+	% \quad
+
+	学\hspace{0.93cm} 院：\underline{ 计算机科学与工程学院}
+
+	专\hspace{0.93cm} 业：\underline{ 智能金融与区块链金融 }
+
+	学生姓名：\underline{\qquad \hspace{0.35cm}郑\hspace{0.6cm}力\hspace{0.6cm}文\qquad \hspace{0.8cm}}
+
+	学\hspace{0.93cm} 号：\underline{\qquad \hspace{0.6cm}2021080401006\qquad \hspace{0.8cm}}
+
+	指导教师：\underline{\qquad \hspace{0.45cm}杨\hspace{1.1cm}挺 \hspace{1cm} \qquad}
+	\vskip 2cm
+
+	\centerline{2021年12月03日}
+	% \end{center}
+\end{center}
+%------------------------------------------------------------------
+	\newpage
+	\tableofcontents
+	\newpage
+	\thispagestyle{fancy}
+  \setlength{\parindent}{2em} %首行缩进两个字符
+		% \noindent{\bf Abstract: }智谷系统智能合约Dapp前端操作总结\\
+		%
+		% \noindent{\bf Keywords: }智谷; 智能合约; 前端;...
+	% \begin{multicols}{2}
+  \addcontentsline{toc}{section}{概述}
+  \section*{\ \ 概述}
+  这篇文章分析并实现了扫雷游戏。\\
+  \indent 其中扫雷为双人积分制扫雷，棋盘以字符串类型产生并输出，扫雷操作以横纵坐标的形式输入。理论可以实现任意N*N的扫雷棋盘，但为了方便调试并节约gas，这里以4*4扫雷为例。比赛结束后根据两人的积分情况以及输赢来决定最后奖金池中分配的比例。\\
+
+  \indent 这里是传统扫雷的界面示意\\
+  \picturehere[0.5]{s2.png}
+  \begin{center} 图-概述 \end{center}
+  \newpage
+  \section{规则设计}
+  \subsection*{规则介绍}
+  \indent 双人积分制扫雷，顾名思义为两人在竞争与合作中共同在一个扫雷棋盘中进行的游戏，总体规则与单人竞速制扫雷\footnote{即在N*N的棋盘中，有一些数字与一些地雷，数字代表周围8个格子的雷的数量，点开一个数字格子即为成功操作，当所有数字格子都被点完（只剩下有雷的格子没被点完）时获得胜利}一样，但多了积分制与奖惩制度。\\
+  \indent 两位玩家事先在奖金池中投入（相同的）赌注。每位玩家完成一次正确的“排雷”操作，即可获得1分。若最终胜利，两玩家按照积分比例瓜分奖金池中的赌注。若某位玩家“排雷失败”，则游戏结束，该玩家获得相应的惩罚。具体奖惩机制如下。\\
+ \indent \indent \heiti \textbf{设：}  \\
+ \songti
+  \begin{center} 玩家A积分为$C_A$,获得奖金为$S_A$\\玩家B积分为$C_B$,获得奖金为$S_B$ \\ 奖金池中金额为Stake \\
+  \end{center}
+
+  \indent \indent \heiti \textbf{则游戏成功时有：}\\
+  \songti
+  $$
+  S_A=\frac{C_A}{C_A+C_B} \times Stake
+  $$
+  $$
+  S_B=\frac{C_B}{C_A+C_B} \times Stake
+  $$
+  \indent \indent \heiti \textbf{游戏失败时有(假设A的操作踩到雷)：}\\
+  $$
+  S_A=min\{\frac{C_A}{C_A+C_B} \times Stake - \frac{Stake}{2},0\}
+  $$
+  $$
+  S_B=max\{\frac{C_B}{C_A+C_B} \times Stake + \frac{Stake}{2},Stake\}
+  $$
+  \newpage
+  \section{代码设计}
+  \indent 设计两个合约，第一个合约(MineSweeper)负责棋盘中的操作，第二个合约(Player)负责面向玩家的操作进行相应的调用，其中第二个合约继承于第一个合约。\\
+  总体设计思想如下：\\
+  \picturehere[0.8]{s3.png}\\
+  \begin{center} 图1.2-1 \end{center}
+  \newpage
+  \subsection{生成棋盘}
+  \indent 设N*N的棋盘中有M颗雷，只需要随机生成M颗雷的位置，然后统计每个格子周围雷的数量即可。\\
+  \\
+  \picturehere[0.5]{s1.png}\\
+  \begin{center} 图1.2-2 \end{center} %
+
+  \indent 这里我们利用一个二维数组a[][]记录棋盘的布局，a[x][y]=-1时代表该位置是雷，否则为该位置周围八个位置雷的数量。\\
+  \indent 同时，我们用一个bytes类型的二维数组Map[][]作为展示给玩家的棋盘布局，"\#"表示该位置暂未被探索，数字则代表该位置已被打开，且数字的大小表示周围雷的数量。如设N=4,M=5：\\
+  \picturehere{s4.png}\\
+  \begin{center} 图1.2-3 \end{center}
+  \indent 从中可以推断出坐标(2,2)位置是雷，坐标(3,4)位置数字为2，最终胜利局面如下图所示\\
+  \picturehere{s5.png}\\
+  \begin{center} 图1.2-4 \end{center}
+	\subsection{玩家加入}
+	\indent 由于该游戏为双人游戏，既不能只加入一个，也不能加入第三个玩家，故为可玩性与安全性考虑需要在游戏开始前事先设定好两位加入玩家的身份。同时，玩家加入必须先给出赌注，即为奖金池充值相应的stake,这里默认两位玩家只能充入相同的stake且由第一位玩家决定stake的数量（这里设定为每位玩家充值金额需要大于等于1 finney）。\\
+	\heiti \indent \textbf{玩家加入的规则设定如下：}
+	\begin{center} 玩家1加入并设定赌注stake\\ 玩家2加入并设定与玩家1相同的stake \end{center}
+	\songti
+	\indent 相应的加入游戏流程图如下:\\
+	\picturehere[0.6]{s6.png}
+	\begin{center}图1.2-5\end{center}
+	\subsection{游戏操作}
+	\indent 这一步是程序设计的最关键部分。\\
+	\indent 先考虑当前操作成功的情况。\\
+	\indent 这里的思路沿用了window7经典版扫雷的思路。为避免当玩家点开第一个格子时只出现一个数字，此时会随机选择3-7个周边的格子打开。在之后的操作中，每翻开一个正确的格子都会把周围雷数量为0大小的格子翻开并继续翻开0周围的格子，直到没有可以翻的格子为止。同时为了提高可玩性，若玩家第一步就开雷，此步作废，重新选择\footnote[1]{虽然这样操作可能会使得玩家直接确定一个雷的位置，但对于N，M较大时对最终得分没有影响，故这里不做讨论。事实上一种可行的方法是让玩家先做完第一步的选择之后再生成棋盘，如此便可以确保玩家不会被“开幕雷击”。}。最后给该成功操作玩家加一分。\\
+	\indent 翻格子的操作使用递归来实现。为了快速定位到周边格子的坐标，这里采用方向向量(DireX,DireY)来定位。当然也有可能出现不合法输入的情况，这将在后面安全性测试中讨论。\\
+	\newpage
+	\indent 这里展示递归打开格子的流程图:\\
+	\picturehere[0.6]{s7.png}
+	\begin{center}图1.2-6\end{center}
+	\indent 而当前操作失败时，直接跳转到失败分奖金的步骤即可。
+	\subsection{游戏结束}
+	\indent 当游戏结束(胜利或结束)时，开始分配奖金。\\
+	\indent 先把游戏状态设置为结束状态，即玩家无法进行操作。同时按照1.1.1中介绍的规则进行分配金额。
+	\subsection*{补充}
+	\indent 上面的流程设计只是初步考虑了大体流程，仍有很多细节会在代码以及后面的安全性分析、鲁棒性测试中说明并体现。
+%---------------------------------------------------------------------------------%--------------------------------------------------------------------------------
+
+
+	\newpage
+  \section{安全性分析}
+  \subsection{随机数产生安全性}
+	 \indent 代码中使用$uint8(keccak256(now, msg.sender, randNonce)) \% (r - l + 1) + l$来产生l-r中的随机数，该方法依赖于时间戳，容易被不诚实的节点攻击。\\
+	 \indent 为了解决这个问题，可以使用“基于hash-commit-reveal 的随机数生成策略”\footnote[1]{摘自李万胜《区块链开发DAPP入门》}，但是在这里暂时不考虑这种方法，若要将该游戏发布到主链上涉及到真金白银的交易，则这种方法必不可少。
+	\subsection{非正常输入场景}
+	\indent 代码中使用IsValid()函数检查输入合法性。\\
+	\indent \heiti \textbf{考虑以下几种不合法输入：} \\
+	\songti
+	\indent \indent 1.输入坐标不是数字，在remix中出现这种情况无法将字符类型的参数传入函数。故在这里不考虑这种情况。\\
+	\indent \indent 2.输入坐标在棋盘外，遇到这种情况直接revert()，让玩家重新输入。\\
+	\indent \indent 3.输入坐标位置已经被翻开，也直接revert()。
+	\subsection{转账}
+	\indent solidity中主要使用send()与transfer()方法进行ethereum上的转账。但由于使用send()失败时不会将费用返还给玩家，故这里的代码中都是用transfer()方法进行转账。
+	\subsection{算术精度问题}
+	\indent 由于solidity中不支持浮点数的运算，所以在进行奖金分配时难免产生误差，当遇到分配无法整除时（向下取整），无法将奖金池中所有钱都转完，为了减少无谓损失，这里将最小赌注金额设置为1 finney ，这样即使产生误差，也能将其控制在2 wei 以内。
+	\subsection{避免合约吞钱 \protect\footnote[2]{添加于2021.12.7} }
+	\indent 由于该游戏进行需要双人同时在线，若玩家1进入游戏后长时间没有玩家2加入，则需要给玩家1增加退钱通道。在程序中该函数(WithdrawMoney)要求30s内玩家二未加入进行退款操作。若未达到30s或玩家2已加入，则改段代码无法运行，直接revert()。
+
+	\newpage
+  \section{部署过程}
+  在remix中建立两个文件，MineSweeper.sol和Player.sol。\\
+	\picturehere[0.5]{s8.png}
+	\begin{center} 图4-1 \end{center}
+	\indent 编译后进行部署 \\
+	\picturehere[0.6]{s9.png}
+	\begin{center} 图4-2 \end{center} %
+
+	\indent 其中Init为初始化棋盘函数，JoinTheGame为玩家加入游戏并设置赌注函数，OpenAt是打开该格子的函数，RealTimeMap是显示当前棋盘的函数，RealTimePlayers为显示当前玩家地址的函数。\\
+	\newpage
+  \section{测试与分析}
+	\subsection{赢得游戏案例展示}
+
+	\indent 在部署完成后，我们使用remix自带的两个测试账户之间进行测试。\\
+	\indent 首先把两个账户加入游戏。选择两个账户并设定好充值金额后运行JoinTheGame函数。结束后两个账户的余额如图所示：\\
+	\picturehere[1.5]{s10.png}
+	\begin{center} 图5.1-1 \end{center} %
+
+	\indent 若此时执行RealTimePlayers函数，则会显示两个玩家的地址:\\
+	\picturehere[1]{s11.png}
+	\begin{center} 图5.1-2 \end{center} %
+
+	\indent 加入成功后，可执行Init进行初始化。\footnote[1]{事实上用户加入和Init没有先后之分}\\
+	\indent 假设用户1执行了OpenAt函数：\\
+	\picturehere[1]{s12.png}
+	\begin{center} 图5.1-3 \end{center} %
+
+	\indent 之后用RealTimeMap展示出当前地图，则有：\\
+	\picturehere[1]{s16.png}
+	\begin{center} 图5.1-4 \end{center} %
+	\newpage
+	\indent 对应的地图展开后也就是这样:\\
+	\picturehere[1]{s17.png}
+	\begin{center} 图5.1-5 \end{center} %
+
+	\indent 不难推算出最终的结果是这样的:\\
+	\picturehere[1]{s19.png}
+	\begin{center} 图5.1-6 \end{center} %
+
+	\indent 我们这里使用账号2进行操作，将上述结果输入，最终赢得游戏，显示出的RealTimeMap为这样：\\
+	\picturehere[1]{s18.png}
+	\begin{center} 图5.1-7 \end{center} %
+
+	\indent 最终赢得游戏后，我们再观察账户信息，可以发现用户2已经获得了奖金池中所有的钱:\\
+	\picturehere[1]{s20.png}
+	\begin{center} 图5.1-8 \end{center} %
+
+	\indent 当然，输掉比赛之后的展示同理，这里不做赘述。
+	\newpage
+	\subsection{不合法操作案例展示}
+	\subsubsection{Stake设置过低}
+	\picturehere[0.666]{s13.png}
+	\begin{center} 图5.2-1 \end{center} %
+
+	\subsubsection{未初始化棋盘}
+	\picturehere[0.666]{s14.png}
+	\begin{center} 图5.2-2 \end{center} %
+
+	\subsubsection{开幕雷击}
+	\picturehere[0.666]{s15.png}
+	\begin{center} 图5.2-3 \end{center} %
+
+	\subsubsection{不合法之人加入游戏}
+	\picturehere[0.666]{s23.png}
+	\begin{center} 图5.2-4 \end{center} %
+
+		\subsubsection{房间已满}
+		\picturehere[0.666]{s22.png}
+		\begin{center} 图5.2-5 \end{center} %
+
+		\newpage
+
+		\subsubsection{输入范围错误}
+		\picturehere[0.666]{s24.png}
+		\begin{center} 图5.2-6 \end{center} %
+
+		\subsubsection{重复打开一个格子}
+		\picturehere[0.666]{s25.png}
+		\begin{center} 图5.2-7 \end{center} %
+
+		\subsubsection{游戏已经结束}
+		\picturehere[0.666]{s21.png}
+		\begin{center} 图5.2-8 \end{center} %
+
+	\newpage
+	\section{改进思路展望}
+	\subsection{配备前端}
+	\indent 扫雷，不论是积分制还是传统型，其最初目的便是比拼速度。但是由于合约布置在以太坊中，导致每一次成功操作都需要交易确认的环节，速度的比拼已经没有意义。当扫雷高手遇到4*4的小地图，一次确认交易的环节足以将整张地图算完。所以这样比拼反而变为了输入坐标的速度和正确性。\\
+	\indent 要使减少输入上的烦恼和对其原始目的的追求，最简单的方法便是为期设置一个前端页面，让鼠标操作便能完成所有功能。\\
+	\indent 可惜由于笔者现在对前端知识的掌握少之又少，暂时还无法为期设计一个前端与合约交互。
+	\subsection{安全性改进}
+	\indent 正如前文提到，该方法生成的棋盘并不安全，理论可以被矿工事先预知，所以我们希望可以改进随机数的生成方法（或套用外部方法）从而提高其安全性。
+
+
+	\section{源码及注释}
+	\subsection{第一个合约——MineSweeper.sol}
+	\begin{lstlisting}
+		pragma solidity ^0.4.18;
+		pragma experimental ABIEncoderV2;
+		/// @title `棋盘操作`
+		/// @author `郑力文`
+		/// @notice `你可以用这个合约中的函数进行棋盘上的基本操作，如初始化棋盘，打开一个格子等`
+		contract MineSweeper {
+		  uint8 constant N = 4;//`设置棋盘大小`
+		  uint8 constant M = 5;//`设置雷的数量`
+		  uint private randNonce = 0;//`随机数生成用`
+		  int[N+2][N+2] private a;//`棋盘的布局情况`
+		  bytes[N+2][N+2] Map;//`对用户展示的棋盘情况`
+		  bytes Unexp = "#";//`未探索的格子`
+		  bool Initialize = false;//`是否初始化`
+		  int[9]  DireX = [-1,0,0,1,-1,1,1,-1,-1];
+		  int[9]  DireY = [-1,1,-1,0,0,1,-1,1,-1];//`方向向量`
+			///@notice `生成一个介于l~r之间的随机数`
+		  function RandomInt(uint8 l,uint8 r)private returns(uint8){
+		    ++randNonce;
+		    return uint8(keccak256(now, msg.sender, randNonce)) % (r - l + 1) + l;
+		  }
+			///@notice `计算这个格子周围的雷的数量`
+		  function MineCount(uint8 x,uint8 y)private returns(int){
+		      if(a[x][y]==-1)return -1;//`若这个格子是雷，不用计算`
+		      int ans=0;
+		      uint8 i;
+		      for(i=1;i<=8;i++)
+		        if(a[uint(int(x)+DireX[i])][uint(int(y)+DireY[i])]==-1)
+		            ans++;
+		    return ans;
+		  }
+			///@notice `初始化棋盘`
+		  function Init()public {
+		      uint8 i;
+		      uint8 j;
+		      uint8 x;
+		      uint8 y;
+		      for(i=1;i<=N;i++)
+		        for(j=1;j<=N;j++)
+		            a[i][j]=0;
+		      for(i=1;i<=M;i++){
+		        x=RandomInt(1,N);
+		        y=RandomInt(1,N);
+		        while(a[x][y]==-1){//`确保不会产生重复的坐标`
+		            x=RandomInt(1,N);
+		            y=RandomInt(1,N);
+		        }
+		        a[x][y]=-1;
+		      }
+		      for(i=1;i<=N;i++)
+		        for(j=1;j<=N;j++){
+		            a[i][j]=MineCount(i,j);
+		            Map[i-1][j-1]="#";
+		        }
+		      Initialize = true;//`已初始化`
+		  }
+			///@notice `连接两个字符串`
+			///@author `此段函数来源于《区块链开发DAPP入门》(李万胜著)`
+		  function strConcat(string memory _a, string memory _b) private returns (string memory){
+		    bytes memory _ba = bytes(_a);
+		    bytes memory _bb = bytes(_b);
+		    string memory ret = new string(_ba.length + _bb.length);
+		    bytes memory bret = bytes(ret);
+		    uint k = 0;
+		    uint i;
+		    for (i = 0; i < _ba.length; i++)bret[k++] = _ba[i];
+		    for (i = 0; i < _bb.length; i++)bret[k++] = _bb[i];
+		    return string(ret);
+		  }
+			///@notice `输出当前面向玩家的Map`
+		  function Output_Now() internal view returns (string[N] memory){
+		      uint8 i;
+		      uint8 j;
+		      string[N] memory s;
+		      for(i=0;i<N;i++){
+		        for(j=0;j<N;j++)
+		        s[i]=strConcat(s[i],string(Map[i][j]));
+		      }
+		      return s;
+		  }
+			///@notice `判断两个字符串是否不相等`
+		  function check(string x,string y)private view returns(bool){
+		      return (keccak256(x)!=keccak256(y));
+		  }
+			///@notice `将int转换为bytes`
+		  function Count(int x)private returns(bytes){
+		      if(x==0)return "0";
+		      if(x==1)return "1";
+		      if(x==2)return "2";
+		      if(x==3)return "3";
+		      if(x==4)return "4";
+		      if(x==5)return "5";
+		      if(x==6)return "6";
+		      if(x==7)return "7";
+		      if(x==8)return "8";
+		  }
+			///@notice `使用递归打开格子`
+			///@param x,y  `坐标`
+			///@param stp `当前操作步数`
+			///@param tot `本次操作总共打开tot个格子`
+			///@dev `即使stp==1,也有总共只打开一个格子，因为扩展的3-7个方向不一定合法`
+		  function OpenIt(uint8 x,uint8 y,uint stp,uint8 tot) private returns (string){
+		      if(x<0||y<0||x>=N||y>=N||tot>=10||
+					check(string(Map[x][y]),string(Unexp))==true||
+					a[x+1][y+1]==-1)
+						return;
+		      Map[x][y]=Count(a[x+1][y+1]);
+		      if(a[x+1][y+1]==0){//`如果这个格子周围无雷，则打开这个格子四周所有格子`
+		          for(uint8 i=1;i<=8;i++)
+		            OpenIt(uint8(x+uint8(DireX[i])),uint8(y+uint8(DireY[i])),stp,++tot);
+		      }else if(stp==1){//`如果当前为第一步，则随机打开周围3-7个格子`
+		          uint8 t = RandomInt(3,7);
+		          for(i=1;i<=t;i++){
+		            uint8 tmp=RandomInt(1,8);
+		            OpenIt(uint8(x+uint8(DireX[tmp])),uint8(y+uint8(DireY[tmp])),stp,++tot);
+		          }
+		      }
+		      return "done";
+		  }
+		  uint stp=0;
+			///@notice `检查输入合法性`
+		  function IsValid(uint8 x,uint8 y)private view returns(uint8){
+		      if(a[x][y]==-1&&stp==0)return 0;//`第一步就遇到雷`
+		      if(x<=0||y<=0||x>N||y>N)return 1;//`输入范围错误`
+		      if(check(string(Map[x-1][y-1]),string(Unexp))) return 2;//`打开了一个打开过的格子`
+		      return 3;//`正常`
+		  }
+			///@notice `检查是否获胜`
+		  function IsWin()private view returns (bool){
+		      uint8 undid=0;
+		      for(uint8 i=0;i<N;i++)
+		        for(uint j=0;j<N;j++)
+		            if(check(string(Map[i][j]),string(Unexp))==false)
+		                ++undid;
+		      return (undid==M);
+		  }
+			///@notice `面向玩家的操作选项卡`
+		  function Open(uint8 x,uint8 y)internal returns (string){
+		      uint8 ErrId = IsValid(x,y);
+		      if(ErrId==0) revert("You meet a Mine in your first step,try again!");
+		      if(ErrId==1) revert("Wrong Range,try again!");
+		      if(ErrId==2) revert("Meet a used place,try again");
+		      ++stp;
+		      if(a[x][y]==-1){return "You Lose!";}
+		      --x;--y;
+		      OpenIt(x,y,stp,1);
+		      if(IsWin()){return "Win!";}
+		      return "Succeed operation!";
+		  }
+		}
+
+	\end{lstlisting}
+	\newpage
+	\subsection{第二个合约——Player.sol}
+	\begin{lstlisting}
+	pragma solidity ^0.4.18;
+	pragma experimental ABIEncoderV2;
+	import "./MineSweeper.sol";
+	/// @title `玩家互动`
+	/// @author `郑力文`
+	/// @notice `主要用于与玩家互动`
+	contract Play is MineSweeper{// `继承自MineSweeper`
+	    address[2] players;//`记录两个玩家的地址`
+	    uint Num;//`记录已加入玩家数量`
+	    mapping(address => uint) Score;//`记录玩家成绩`
+	    uint stake;//`记录赌注`
+	    bool going=true;//`记录游戏是否正常进行`
+			///@notice `这个修改器用于判断当前玩家是否可以加入`
+	    modifier isJoinable() {
+	        require(players[0] == address(0) || players[1] == address(0),
+	                "The room is full."
+	        );//`房间已满`
+	        require((players[0] != address(0) && msg.value == stake) || (players[0] == address(0)),
+	                "You must pay the EXCAT stake to play the game."
+	        );//`stake不足或与第一个玩家不相等`
+	        _;
+	    }
+			///@notice `用于判断当前操作的玩家是否是游戏前加入的两个人`
+	    modifier isPlayer(){
+	        require(msg.sender==players[0]||msg.sender==players[1],
+	            "You are not playing in the game!"
+	        );
+	        _;
+	    }
+			///@notice `用于判断游戏是否未结束`
+	    modifier NotEnd() {
+	      require(going==true,
+	        "Game is over already!"
+	        );
+	      _;
+	    }
+			///@notice `用于判断是否初始化棋盘`
+	    modifier HaveInit() {
+	        require(Initialize==true,"You have not INITIALIZED!");
+	        _;
+	    }
+			///@notice `显示当前两个玩家的地址`
+	    function RealTimePlayers()public view returns(address,address){
+	        return (players[0],players[1]);
+	    }
+			///@notice `让当前账户玩家加入游戏`
+			function JoinTheGame() public payable isJoinable{
+	        require(msg.value >= 1 finney,"The stakes are too LOW!!!");
+	        //`要求stake>=1finnye`
+	        players[Num] = msg.sender;
+	        ++Num;
+	        if(Num==1){stake = msg.value;Time = now;}//`玩家1拥有设定stake的权限`
+	    }
+	    ///@notice `若玩家2长时间未加入游戏，玩家一可以申请退款`
+			function WithdrawMoney() public isPlayer {
+	        require(now - Time > 30 seconds && players[1]==address(0),
+					"Please wait at lease 30 seconds to get your ether back!");
+	        players[0].transfer(stake);
+	    }
+			///@notice `显示实时地图`
+	    function RealTimeMap() public view isPlayer returns(string[N] memory){
+	        return Output_Now();
+	    }
+			///@notice `判断两个字符串是否相等`
+	    function Equal(string x,string y)private view returns(bool){
+	        return (keccak256(x)==keccak256(y));
+	    }
+			///@notice `取最大值`
+	    function Max(uint x,uint y)private returns(uint){
+	        if(x>=y)return x;
+	        return y;
+	    }
+			///@notice `取最小值`
+	   function Min(uint x,uint y)private returns(uint){
+	        if(x>=y)return y;
+	        return x;
+	    }
+			///@notice `输了之后瓜分奖金`
+	    function Lose(address x) private {
+	        going=false;
+	        address y;
+	        if(x==players[0])y=players[1];else y=players[0];
+	        if(x<=2){x.transfer(stake-0.5 finney);y.transfer(stake+0.5 finney);return;}
+	        x.transfer(((Score[x]*2*stake)/(Score[x]+Score[y])));
+	        y.transfer(((Score[y]*2*stake)/(Score[x]+Score[y])));
+	    }
+			///@notice `赢了之后瓜分奖金`
+	    function Win(address x) private {
+	        going=false;
+	        address y;
+	        if(x==players[0])y=players[1];else y=players[0];
+	        x.transfer(Min(((Score[x]*2*stake)/(Score[x]+Score[y])) + stake,stake*2));
+	        y.transfer(Max(((Score[y]*2*stake)/(Score[x]+Score[y])) - stake,0));
+	    }
+			///@notice `打开(x,y)的格子`
+	    function OpenAt(uint8 x,uint8 y) public isPlayer NotEnd HaveInit{
+	        string memory res = Open(x,y);//`判断是否合法`
+	        if(Equal(res,"You Lose!")==true)  {Lose(msg.sender);return;}
+	        if(Equal(res,"Win!")==true)       {Win(msg.sender);return;}
+	        if(Equal(res,"Succeed operation!")==true){++Score[msg.sender];}
+	    }
+	}
+	\end{lstlisting}
+\end{document}
